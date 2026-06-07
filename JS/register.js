@@ -23,30 +23,20 @@ form.addEventListener("submit", async function (event) {
   errorDiv.textContent = "";
   successDiv.textContent = "";
 
-  const nameField = document.getElementById("name");
-  const emailField = document.getElementById("email");
-  const passwordField = document.getElementById("password");
-  const confirmPasswordField = document.getElementById("confirm-password");
-
-  nameField.removeAttribute("aria-invalid");
-  emailField.removeAttribute("aria-invalid");
-  passwordField.removeAttribute("aria-invalid");
-  confirmPasswordField.removeAttribute("aria-invalid");
-
   // Get form values
-  const nameInput = nameField.value.trim();
-  const emailInput = emailField.value.trim().toLowerCase();
-  const passwordInput = passwordField.value;
-  const confirmPasswordInput = confirmPasswordField.value;
+  const nameInput = document.getElementById("name").value.trim();
+  const emailInput = document
+    .getElementById("email")
+    .value.trim()
+    .toLowerCase();
+  const passwordInput = document.getElementById("password").value;
+  const confirmPasswordInput =
+    document.getElementById("confirm-password").value;
 
   // Validation
   if (!nameInput || !emailInput || !passwordInput || !confirmPasswordInput) {
     errorDiv.textContent = "All fields are required.";
     errorDiv.style.color = "darkred";
-    if (!nameInput) nameField.setAttribute("aria-invalid", "true");
-    if (!emailInput) emailField.setAttribute("aria-invalid", "true");
-    if (!passwordInput) passwordField.setAttribute("aria-invalid", "true");
-    if (!confirmPasswordInput) confirmPasswordField.setAttribute("aria-invalid", "true");
     return;
   }
 
@@ -55,15 +45,12 @@ form.addEventListener("submit", async function (event) {
     errorDiv.textContent =
       "Password must be at least 8 characters long and contain letters and numbers.";
     errorDiv.style.color = "darkred";
-    passwordField.setAttribute("aria-invalid", "true");
     return;
   }
 
   if (passwordInput !== confirmPasswordInput) {
     errorDiv.textContent = "Passwords do not match.";
     errorDiv.style.color = "darkred";
-    passwordField.setAttribute("aria-invalid", "true");
-    confirmPasswordField.setAttribute("aria-invalid", "true");
     return;
   }
 
@@ -82,7 +69,7 @@ form.addEventListener("submit", async function (event) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registerData),
-      }
+      },
     );
 
     const registrationResult = await registrationResponse.json();
@@ -97,16 +84,18 @@ form.addEventListener("submit", async function (event) {
 
     // Register successful -> login to get token
     const loginResponse = await fetch("https://v2.api.noroff.dev/auth/login", {
-        method: "POST",
-        headers: {"Content-Type" : "application/json"},
-        body: JSON.stringify({
-            email: emailInput,
-            password: passwordInput,
-        }),
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: emailInput,
+        password: passwordInput,
+      }),
     });
     const loginResult = await loginResponse.json();
-    if(!loginResponse.ok){
-        throw new Error(loginResult.message || "Login after registeration failed");
+    if (!loginResponse.ok) {
+      throw new Error(
+        loginResult.message || "Login after registeration failed",
+      );
     }
     const { accessToken, ...userData } = loginResult.data;
 
@@ -115,17 +104,20 @@ form.addEventListener("submit", async function (event) {
     localStorage.setItem("user", JSON.stringify(userData));
 
     // Create API key with token
-    const apiKeyResponse = await fetch("https://v2.api.noroff.dev/auth/create-api-key",{
+    const apiKeyResponse = await fetch(
+      "https://v2.api.noroff.dev/auth/create-api-key",
+      {
         method: "POST",
         headers: {
-            Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/json" 
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
         },
-    });
-    
+      },
+    );
+
     const apiKeyResult = await apiKeyResponse.json();
-    if (!apiKeyResult.ok){
-        throw new Error(apiKeyResult.message || "Failed to generate API Key");
+    if (!apiKeyResult.ok) {
+      throw new Error(apiKeyResult.message || "Failed to generate API Key");
     }
 
     const apiKey = apiKeyResult.data.key;
@@ -134,18 +126,14 @@ form.addEventListener("submit", async function (event) {
     // Success message
     successDiv.textContent = "Register successful! Redirecting to Home Page";
     successDiv.style.color = "green";
-    nameField.removeAttribute("aria-invalid");
-    emailField.removeAttribute("aria-invalid");
-    passwordField.removeAttribute("aria-invalid");
-    confirmPasswordField.removeAttribute("aria-invalid");
     form.reset();
 
     //Time function for redirect
-    setTimeout(() =>{
-        window.location.href = "../index.html";
+    setTimeout(() => {
+      window.location.href = "../index.html";
     }, 2000);
-    } catch (error){
-        errorDiv.textContent = error.message;
-        errorDiv.style.color = "darkred";
-    }
+  } catch (error) {
+    errorDiv.textContent = error.message;
+    errorDiv.style.color = "darkred";
+  }
 });
