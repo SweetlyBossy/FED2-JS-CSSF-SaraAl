@@ -2,10 +2,10 @@
   "name": "fed2-js-meratr",
   "version": "1.0.0",
   "scripts": {
-    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css",
+    "build": "tailwindcss -i ./src/input.css -o ./dist/output.css --minify",
     "watch": "tailwindcss -i ./src/input.css -o ./dist/output.css --watch"
   },
   "devDependencies": {
-    "tailwindcss": "^4.1.13"
+    "tailwindcss": "^4.3.0"
   }
 }
